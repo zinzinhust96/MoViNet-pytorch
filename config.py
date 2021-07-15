@@ -4,8 +4,8 @@ https://github.com/PeizeSun/SparseR-CNN/blob/dff4c43a9526a6d0d2480abc833e78a7c29
 """
 from fvcore.common.config import CfgNode as CN
 
-def fill_SE_config(conf, input_channels, 
-                    out_channels, 
+def fill_SE_config(conf, input_channels,
+                    out_channels,
                     expanded_channels,
                     kernel_size,
                     stride,
@@ -16,7 +16,7 @@ def fill_SE_config(conf, input_channels,
     conf.expanded_channels =expanded_channels
     conf.padding_avg= padding_avg
     fill_conv(conf,input_channels,
-                out_channels, 
+                out_channels,
                 kernel_size,
                 stride,
                 padding,
@@ -24,7 +24,7 @@ def fill_SE_config(conf, input_channels,
                 activation_layer = None)
 
 def fill_conv(conf, input_channels,
-                out_channels, 
+                out_channels,
                 kernel_size,
                 stride,
                 padding,
@@ -37,9 +37,9 @@ def fill_conv(conf, input_channels,
     conf.padding = padding
     conf.norm_layer = norm_layer
     conf.activation_layer = activation_layer
-   
 
-    
+
+
 
 _C = CN()
 
@@ -55,6 +55,12 @@ _C.MODEL.MoViNetA0.name = "A0"
 _C.MODEL.MoViNetA0.weights = "https://github.com/Atze00/MoViNet-pytorch/blob/main/weights/modelA0_statedict_v2?raw=true"
 _C.MODEL.MoViNetA0.conv1 = CN()
 fill_conv(_C.MODEL.MoViNetA0.conv1, 3,8,(1,3,3),(1,2,2),(0,1,1))
+# NOTE:
+# input_channels = 3
+# out_channels = 8
+# kernel_size = (1,3,3)
+# stride = (1,2,2)
+# padding = (0,1,1)
 
 
 _C.MODEL.MoViNetA0.blocks = [ [CN()],
@@ -68,6 +74,14 @@ fill_SE_config(_C.MODEL.MoViNetA0.blocks[0][0], 8, 8, 24, (1,5,5), (1,2,2), (0,2
 
 #block 3
 fill_SE_config(_C.MODEL.MoViNetA0.blocks[1][0], 8, 32, 80, (3,3,3), (1,2,2), (1,0,0), (0,0,0))
+# NOTE:
+# input_channels = 8
+# out_channels = 32
+# expanded_channels = 80
+# kernel_size = (3,3,3)
+# stride = (1,2,2)
+# padding = (1,0,0)
+# padding_avg = (0,0,0)
 fill_SE_config(_C.MODEL.MoViNetA0.blocks[1][1], 32, 32, 80, (3,3,3), (1,1,1), (1,1,1), (0,1,1))
 fill_SE_config(_C.MODEL.MoViNetA0.blocks[1][2], 32, 32, 80, (3,3,3), (1,1,1), (1,1,1), (0,1,1))
 

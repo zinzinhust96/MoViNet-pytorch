@@ -83,6 +83,8 @@ class CausalConv3D(CausalModule):
         else:
             if self.activation is None:
                 self._setup_activation(x.shape)
+
+            # NOTE: x [16, 80, 16, 45, 45] (bs, num_channels, T, S, S)
             x = torch.cat((self.activation.to(device), x), 2)
             self._save_in_activation(x)
             x = self.conv(x)
