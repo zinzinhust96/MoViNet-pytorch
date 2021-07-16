@@ -4,11 +4,12 @@ https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv2.html
 https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv3.html
 """
 from collections import OrderedDict
-import torch
-from torch.nn.modules.utils import _triple, _pair
-import torch.nn.functional as F
 from typing import Any, Callable, Optional, Tuple, Union
-from torch import nn, Tensor
+
+import torch
+import torch.nn.functional as F
+from torch import Tensor, nn
+from torch.nn.modules.utils import _pair, _triple
 
 
 class swish(nn.Module):
@@ -337,8 +338,9 @@ class MoViNet(nn.Module):
                  cfg: "CfgNode",
                  num_classes: int,
                  causal: bool = True,
-                 pretrained: bool = False,
-                 tf_like: bool = False
+                 pretrained: str = None,
+                 tf_like: bool = False,
+                 device: str = 'cpu'
                  ) -> None:
         super().__init__()
         if pretrained:
@@ -389,8 +391,12 @@ class MoViNet(nn.Module):
         if causal:
             self.cgap = TemporalCGAvgPool3D()
         if pretrained:
-            state_dict = torch.hub.load_state_dict_from_url(cfg.weights)
-            self.load_state_dict(state_dict)
+            print("Restored from {}".format(pretrained))
+            # state_dict = torch.hub.load_state_dict_from_url(cfg.weights)
+            state_dict = torch.load(pretrained, map_location=device)
+            # do not load weights of classifier
+            state_dict = {k: v for k, v in state_dict.items() if 'classifier' not in k}
+            self.load_state_dict(state_dict, strict=False)
         else:
             self.apply(self._weight_init)
         self.causal = causal
