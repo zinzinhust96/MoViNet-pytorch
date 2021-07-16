@@ -102,16 +102,6 @@ def main(args):
                                               transform=transform_test,
                                               num_workers=2)
 
-    # print('processing train')
-    # hmdb51_train = torchvision.datasets.HMDB51('data/video_data_1', 'data/test_train_splits_1', 16,frame_rate=5,
-    #                                                 step_between_clips = 2, fold=1, train=True,
-    #                                                 transform=transform, num_workers=2)
-
-
-    # print('processing test')
-    # hmdb51_test = torchvision.datasets.HMDB51('data/video_data_1', 'data/test_train_splits_1', 16,frame_rate=5,
-    #                                             step_between_clips = 2, fold=1, train=False,
-    #                                             transform=transform_test, num_workers=2)
     train_loader = DataLoader(hmdb51_train, batch_size=args.bs_train, shuffle=True)
     test_loader  = DataLoader(hmdb51_test, batch_size=args.bs_test, shuffle=False)
 

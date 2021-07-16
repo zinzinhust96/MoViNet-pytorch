@@ -1,0 +1,1 @@
+python evaluate.py --video_path data/video_data --annotation_path data/test_train_splits --pretrained results/theft/model_epoch0005_loss1.0017_acc77.00.pth
