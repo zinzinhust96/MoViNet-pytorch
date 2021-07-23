@@ -52,7 +52,6 @@ def main(args):
                                     #T.Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
                                     T.CenterCrop((172, 172))])
 
-    # TODO: figure out the size of input
     print('processing test')
     hmdb51_test = torchvision.datasets.HMDB51(args.video_path,
                                               args.annotation_path,
@@ -63,7 +62,7 @@ def main(args):
                                               transform=transform_test,
                                               num_workers=2)
 
-    test_loader  = DataLoader(hmdb51_test, batch_size=args.bs_test, shuffle=False)
+    test_loader = DataLoader(hmdb51_test, batch_size=args.bs_test, shuffle=False)
 
     model = MoViNet(_C.MODEL.MoViNetA0, 51,causal = False, pretrained = None, tf_like = True, device=device)
     model = model.to(device)

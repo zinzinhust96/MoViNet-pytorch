@@ -1,6 +1,6 @@
 CUDA_VISIBLE_DEVICE=1 python train.py \
---video_path data/video_data_1 \
---annotation_path data/test_train_splits_1 \
+--video_path data/video_data \
+--annotation_path data/test_train_splits \
 --num_frames 16 \
 --clip_steps 2 \
 --bs_train 16 \
