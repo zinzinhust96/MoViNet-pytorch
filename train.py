@@ -29,7 +29,7 @@ def train_iter(model, optimz, data_load, args):
 
         out = F.log_softmax(model(data.to(args.device)), dim=1)
 
-        if debug:
+        if args.debug:
             t1 = time.time()
 
         loss = F.nll_loss(out, target.to(args.device))
