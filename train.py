@@ -22,17 +22,36 @@ def train_iter(model, optimz, data_load, args):
     model.to(args.device)
     model.clean_activation_buffers()
     optimz.zero_grad()
+    exe_times = []
     for i, (data,_ , target) in enumerate(tqdm(data_load)):
+        if args.debug:
+            t0 = time.time()
+
         out = F.log_softmax(model(data.to(args.device)), dim=1)
+
+        if debug:
+            t1 = time.time()
+
         loss = F.nll_loss(out, target.to(args.device))
         loss.backward()
         optimz.step()
         optimz.zero_grad()
         model.clean_activation_buffers()
+
+        if args.debug:
+            exe_times.append(t1 - t0)
+
         if i % args.log_interval == 0:
             print('[' +  '{:5}'.format(i * len(data)) + '/' + '{:5}'.format(samples) +
                   ' (' + '{:3.0f}'.format(100 * i / len(data_load)) + '%)]  Loss: ' +
                   '{:6.4f}'.format(loss.item()))
+
+            if args.debug:
+                print('Forward time: ', t1 - t0)
+
+    if args.debug:
+        print('Average forward time: ', np.mean(exe_times))
+
 
 def evaluate(model, data_load, args):
     model.eval()
@@ -79,7 +98,7 @@ def main(args):
                                     #T.Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
                                     T.CenterCrop((172, 172))])
 
-    # TODO: figure out the size of input
+    # input_size [16, 3, 16, 172, 172] (bs, num_channels, T, S, S)
 
     print('processing train')
     hmdb51_train = torchvision.datasets.HMDB51(args.video_path,
@@ -137,6 +156,7 @@ if __name__ == '__main__':
     parser.add_argument("--store_path", default='./results/debug', help="path to save trained model")
     parser.add_argument("--pretrained", default=None, help="path to pre-trained model")
     parser.add_argument("--gpu", type=int, default=-1, help="gpu")
+    parser.add_argument("--debug", action='store_true', help="debug mode to calculate execution time")
     args = parser.parse_args()
     print(args)
     main(args)
