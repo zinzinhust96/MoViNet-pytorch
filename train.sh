@@ -1,10 +1,11 @@
 CUDA_VISIBLE_DEVICE=1 python train.py \
---video_path data/video_data \
---annotation_path data/test_train_splits \
+--video_path data/cut_clip_data_30fps/video_data \
+--annotation_path data/cut_clip_data_30fps/test_train_splits \
 --num_frames 16 \
---clip_steps 2 \
+--clip_steps 1 \
 --bs_train 16 \
 --bs_test 16 \
 --lr 0.00005 \
---gpu 1 \
---pretrained results/theft/model_epoch0005_loss1.0017_acc77.00.pth
+--gpu 0 \
+--store_path './results/theft_2807' \
+--pretrained weights/modelA0_statedict_v2

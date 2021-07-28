@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import time
 
 import torch
@@ -12,6 +13,7 @@ from tqdm import tqdm
 
 import transforms as T
 from config import _C
+from hmdb51_dataset import HMDB51
 from models import MoViNet
 
 torch.manual_seed(97)
@@ -63,6 +65,9 @@ def main(args):
     if not os.path.isdir(args.store_path):
         os.mkdir(args.store_path)
 
+    # copy config to store path
+    shutil.copy2('./train.sh', args.store_path)
+
     # Set cuda device
     device = 'cuda:{}'.format(args.gpu) if args.gpu != -1 else 'cpu'
     args.device = device
@@ -79,33 +84,33 @@ def main(args):
                                     #T.Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
                                     T.CenterCrop((172, 172))])
 
-    # TODO: figure out the size of input
+    # input_size [16, 3, 16, 172, 172] (bs, num_channels, T, S, S)
 
     print('processing train')
-    hmdb51_train = torchvision.datasets.HMDB51(args.video_path,
-                                               args.annotation_path,
-                                               args.num_frames,
-                                               frame_rate=5,
-                                               step_between_clips = args.clip_steps,
-                                               train=True,
-                                               transform=transform,
-                                               num_workers=2)
+    hmdb51_train = HMDB51(args.video_path,
+                          args.annotation_path,
+                          args.num_frames,
+                          frame_rate=5,
+                          step_between_clips = args.clip_steps,
+                          train=True,
+                          transform=transform,
+                          num_workers=2)
 
 
     print('processing test')
-    hmdb51_test = torchvision.datasets.HMDB51(args.video_path,
-                                              args.annotation_path,
-                                              args.num_frames,
-                                              frame_rate=5,
-                                              step_between_clips = args.clip_steps,
-                                              train=False,
-                                              transform=transform_test,
-                                              num_workers=2)
+    hmdb51_test = HMDB51(args.video_path,
+                         args.annotation_path,
+                         args.num_frames,
+                         frame_rate=5,
+                         step_between_clips = args.clip_steps,
+                         train=False,
+                         transform=transform_test,
+                         num_workers=2)
 
     train_loader = DataLoader(hmdb51_train, batch_size=args.bs_train, shuffle=True)
     test_loader  = DataLoader(hmdb51_test, batch_size=args.bs_test, shuffle=False)
 
-    model = MoViNet(_C.MODEL.MoViNetA0, 51,causal = False, pretrained = args.pretrained, tf_like = True, device=device)
+    model = MoViNet(_C.MODEL.MoViNetA0, 2,causal = False, pretrained = args.pretrained, tf_like = True, device=device)
     # model.classifier[3] = torch.nn.Conv3d(2048, 51, (1,1,1))
     optimz = optim.Adam(model.parameters(), lr=args.lr)
     # start_time = time.time()
