@@ -11,7 +11,6 @@ from tqdm import tqdm
 import transforms as T
 from config import _C
 from models import MoViNet
-from video_utils import VideoClips
 
 
 def extract_overlap_subclips(vid_capture, skip_frame, length_of_subclip = 16):
@@ -20,18 +19,20 @@ def extract_overlap_subclips(vid_capture, skip_frame, length_of_subclip = 16):
     frame_list = []
     subclips = []
     while(vid_capture.isOpened()):
-        frame_count += 1
         ret, frame = vid_capture.read()
         if not ret:
-            print('wtf is happening')
             break
 
-        if frame_count % skip_frame == 0:
+        if skip_frame == 0:
+            frame_list.append(frame)
+        elif frame_count % skip_frame == 0:
             frame_list.append(frame)
         if len(frame_list) == length_of_subclip:
             frame_array = np.stack(frame_list)
             subclips.append(frame_array)
             del frame_list[0]
+
+        frame_count += 1
 
     return subclips
 
@@ -75,9 +76,9 @@ def main(args):
     frame_width = int(vid_capture.get(3))
     frame_height = int(vid_capture.get(4))
     frame_size = (frame_width, frame_height)
-    print(f'| Video info:\n - fps: {fps} \n - Frame number: {frame_total}, \n - Frame size: {frame_width}, {frame_height}')
+    print(f'| Video info:\n - fps: {fps} \n - Frame number: {frame_total}, \n - Frame size: {frame_width}, {frame_height} \n - Frame total: {frame_total}')
 
-    fps_output = 5
+    fps_output = 30
     skip_frame = math.ceil(fps/fps_output) - 1
 
     subclips = extract_overlap_subclips(vid_capture, skip_frame, args.num_frames)
