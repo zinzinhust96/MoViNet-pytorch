@@ -74,15 +74,16 @@ def main(args):
 
     transform = transforms.Compose([
                                     T.ToFloatTensorInZeroOne(),
-                                    T.Resize((200, 200)),
-                                    T.RandomHorizontalFlip(),
-                                    #T.Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
-                                    T.RandomCrop((172, 172))])
+                                    T.Resize((200, 200))
+                                ])
+                                #T.Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
+                                # T.RandomCrop((172, 172))])
     transform_test = transforms.Compose([
                                     T.ToFloatTensorInZeroOne(),
-                                    T.Resize((200, 200)),
-                                    #T.Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
-                                    T.CenterCrop((172, 172))])
+                                    T.Resize((200, 200))
+                                ])
+                                #T.Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
+                                # T.CenterCrop((172, 172))])
 
     # input_size [16, 3, 16, 172, 172] (bs, num_channels, T, S, S)
 
@@ -90,8 +91,8 @@ def main(args):
     hmdb51_train = HMDB51(args.video_path,
                           args.annotation_path,
                           args.num_frames,
-                          frame_rate=5,
-                          step_between_clips = args.clip_steps,
+                          frame_rate=args.frame_rate,
+                          step_between_clips=args.clip_steps,
                           train=True,
                           transform=transform,
                           num_workers=2)
@@ -101,8 +102,8 @@ def main(args):
     hmdb51_test = HMDB51(args.video_path,
                          args.annotation_path,
                          args.num_frames,
-                         frame_rate=5,
-                         step_between_clips = args.clip_steps,
+                         frame_rate=args.frame_rate,
+                         step_between_clips=args.clip_steps,
                          train=False,
                          transform=transform_test,
                          num_workers=2)
@@ -134,11 +135,12 @@ if __name__ == '__main__':
     parser.add_argument("--annotation_path", required=True, help="path to validation data set")
     parser.add_argument("--num_frames", type=int, required=True, help="number of frames in input")
     parser.add_argument("--clip_steps", type=int, required=True, help="number of frames between subsclips")
+    parser.add_argument("--frame_rate", type=int, required=True, help="frame rate to sample subclip")
     parser.add_argument("--bs_train", type=int, required=True, help="batch size train")
     parser.add_argument("--bs_test", type=int, required=True, help="batch size test")
     parser.add_argument("--lr", type=float, required=True, help="learning rate")
     parser.add_argument("--log_interval", type=int, default=100, help="train loss log interval")
-    parser.add_argument("--num_epochs", default=50, help="number of epochs")
+    parser.add_argument("--num_epochs", default=100, help="number of epochs")
     parser.add_argument("--store_path", default='./results/debug', help="path to save trained model")
     parser.add_argument("--pretrained", default=None, help="path to pre-trained model")
     parser.add_argument("--gpu", type=int, default=-1, help="gpu")
