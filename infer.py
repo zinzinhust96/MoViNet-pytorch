@@ -60,10 +60,9 @@ def main(args):
     args.device = device
 
     transform_test = transforms.Compose([
-                    T.ToFloatTensorInZeroOne(),
-                    T.Resize((200, 200)),
-                    #T.Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
-                    T.CenterCrop((172, 172))])
+                        T.ToFloatTensorInZeroOne(),
+                        T.Resize((200, 200))
+                    ])
 
     # '''
     vid_capture = cv2.VideoCapture(args.video_path)
@@ -78,7 +77,7 @@ def main(args):
     frame_size = (frame_width, frame_height)
     print(f'| Video info:\n - fps: {fps} \n - Frame number: {frame_total}, \n - Frame size: {frame_width}, {frame_height} \n - Frame total: {frame_total}')
 
-    fps_output = 30
+    fps_output = 10
     skip_frame = math.ceil(fps/fps_output) - 1
 
     subclips = extract_overlap_subclips(vid_capture, skip_frame, args.num_frames)
@@ -116,7 +115,7 @@ def main(args):
 
 
     # initialize model
-    model = MoViNet(_C.MODEL.MoViNetA0, 51,causal = False, pretrained = None, tf_like = True, device=device)
+    model = MoViNet(_C.MODEL.MoViNetA0, 2,causal = False, pretrained = None, tf_like = True, device=device)
     model = model.to(device)
     if args.pretrained is not None and args.pretrained != 'None':
         model.load_state_dict(torch.load(args.pretrained, map_location=device))
@@ -128,10 +127,10 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Movinet inference')
-    parser.add_argument("--video_path", required=True, help="path to video")
     parser.add_argument("--num_frames", type=int, default=16, help="number of frames in input")
     parser.add_argument("--bs_test", type=int, default=16, help="batch size test")
-    parser.add_argument("--pretrained", default='/hdd/namdng/action_recognition/MoViNet-pytorch/results/theft/model_epoch0005_loss1.0017_acc77.00.pth', help="path to pre-trained model")
+    parser.add_argument("--video_path", default='/hdd/namdng/action_recognition/MoViNet-pytorch/data/cut_clip_data_30fps/video_data/theft/0050_2_2416.mp4', help="path to video")
+    parser.add_argument("--pretrained", default='/hdd/namdng/action_recognition/MoViNet-pytorch/results/theft_2807_hw_200/model_epoch0010_loss0.6321_acc80.90.pth', help="path to pre-trained model")
     parser.add_argument("--gpu", type=int, default=0, help="gpu")
     args = parser.parse_args()
     print(args)
